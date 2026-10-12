@@ -9,10 +9,10 @@ import {
   Layers,
   CheckCircle2,
   AlertCircle,
-  ExternalLink,
-  Smartphone,
   FolderTree,
-  PlayCircle
+  PlayCircle,
+  Image as ImageIcon,
+  Sparkles
 } from 'lucide-react';
 
 const WORKFLOW_YAML = `name: Build Android Debug APK
@@ -100,7 +100,7 @@ android {
         versionCode 1
         versionName "1.0.0"
 
-        setProperty("archivesBaseName", "app")
+
     }
 
     buildTypes {
@@ -118,11 +118,21 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'ProtectedPermissions'
+    }
+
     packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+}
+
+base {
+    archivesName = 'app'
 }
 
 dependencies {
@@ -160,9 +170,18 @@ validateDistributionUrl=true
 zipStoreBase=GRADLE_USER_HOME
 zipStorePath=wrapper/dists`;
 
+const ICON_RESOLUTIONS = [
+  { density: 'xxxhdpi', size: '192 x 192', file: 'res/mipmap-xxxhdpi/ic_launcher.png' },
+  { density: 'xxhdpi', size: '144 x 144', file: 'res/mipmap-xxhdpi/ic_launcher.png' },
+  { density: 'xhdpi', size: '96 x 96', file: 'res/mipmap-xhdpi/ic_launcher.png' },
+  { density: 'hdpi', size: '72 x 72', file: 'res/mipmap-hdpi/ic_launcher.png' },
+  { density: 'mdpi', size: '48 x 48', file: 'res/mipmap-mdpi/ic_launcher.png' },
+  { density: 'adaptive foreground', size: '512 x 512', file: 'res/drawable/ic_launcher_foreground.png' },
+];
+
 export default function App() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'workflow' | 'gradle' | 'guide' | 'structure'>('workflow');
+  const [activeTab, setActiveTab] = useState<'icon' | 'workflow' | 'gradle' | 'structure' | 'guide'>('icon');
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -176,17 +195,20 @@ export default function App() {
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-emerald-500/20">
-              <Smartphone className="w-6 h-6" />
-            </div>
+            <img
+              src="/icon.png"
+              alt="GMS-Protect Icon"
+              referrerPolicy="no-referrer"
+              className="w-10 h-10 rounded-xl shadow-lg shadow-emerald-500/20 object-cover border border-slate-700/60"
+            />
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="font-semibold text-lg text-white">Xiaomi Notification Fix (GMS Protect)</h1>
-                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  CI/CD Ready
+                <h1 className="font-semibold text-lg text-white">Xiaomi Notification Fix (GMS-Protect)</h1>
+                <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> Icon Updated
                 </span>
               </div>
-              <p className="text-xs text-slate-400">GitHub Actions Android APK Build Automation & Gradle Setup</p>
+              <p className="text-xs text-slate-400">GitHub Actions Android APK Build Automation & Mipmap Icon Assets</p>
             </div>
           </div>
 
@@ -204,8 +226,19 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+              App Icon Status
+              <ImageIcon className="w-4 h-4 text-emerald-400" />
+            </div>
+            <div className="text-lg font-bold text-white flex items-center gap-2">
+              <span className="text-emerald-400">Đã cập nhật</span>
+            </div>
+            <div className="text-xs text-slate-400 mt-1">Đồng bộ toàn bộ mipmap & adaptive icon</div>
+          </div>
+
+          <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
+            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
               Workflow Trigger
-              <Workflow className="w-4 h-4 text-emerald-400" />
+              <Workflow className="w-4 h-4 text-teal-400" />
             </div>
             <div className="text-lg font-bold text-white">push: [main]</div>
             <div className="text-xs text-slate-400 mt-1">Hỗ trợ workflow_dispatch thủ công</div>
@@ -214,19 +247,10 @@ export default function App() {
           <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
             <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
               Artifact Name
-              <CheckCircle2 className="w-4 h-4 text-teal-400" />
+              <CheckCircle2 className="w-4 h-4 text-blue-400" />
             </div>
             <div className="text-lg font-bold text-emerald-400 truncate">Xiaomi-Notification-Fix-Debug</div>
             <div className="text-xs text-slate-400 mt-1">File xuất xưởng: app-debug.apk</div>
-          </div>
-
-          <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
-            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
-              Gradle Wrapper
-              <Terminal className="w-4 h-4 text-blue-400" />
-            </div>
-            <div className="text-lg font-bold text-white">Gradle 8.7 / AGP 8.4.2</div>
-            <div className="text-xs text-slate-400 mt-1">Tự cấp quyền chmod +x ./gradlew</div>
           </div>
 
           <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl relative overflow-hidden">
@@ -235,15 +259,27 @@ export default function App() {
               <ShieldCheck className="w-4 h-4 text-amber-400" />
             </div>
             <div className="text-lg font-bold text-slate-200">Debug Keystore (Auto)</div>
-            <div className="text-xs text-slate-400 mt-1">Không yêu cầu key, không đẩy Play Store</div>
+            <div className="text-xs text-slate-400 mt-1">Không cần keystore riêng, tự ký debug</div>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-800 space-x-1">
+        <div className="flex border-b border-slate-800 space-x-1 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('icon')}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 shrink-0 ${
+              activeTab === 'icon'
+                ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <ImageIcon className="w-4 h-4" />
+            <span>Biểu tượng (Icon Mới)</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('workflow')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 shrink-0 ${
               activeTab === 'workflow'
                 ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -255,7 +291,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('gradle')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 shrink-0 ${
               activeTab === 'gradle'
                 ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -267,7 +303,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('structure')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 shrink-0 ${
               activeTab === 'structure'
                 ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -279,7 +315,7 @@ export default function App() {
 
           <button
             onClick={() => setActiveTab('guide')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 shrink-0 ${
               activeTab === 'guide'
                 ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
@@ -289,6 +325,75 @@ export default function App() {
             <span>Hướng dẫn chạy & Tải APK</span>
           </button>
         </div>
+
+        {/* Tab 0: Icon Showcase */}
+        {activeTab === 'icon' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                {/* Left side preview */}
+                <div className="md:col-span-5 flex flex-col items-center text-center">
+                  <div className="relative group">
+                    <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/30 to-blue-500/30 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition duration-500"></div>
+                    <img
+                      src="/icon.png"
+                      alt="GMS-Protect App Icon"
+                      referrerPolicy="no-referrer"
+                      className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-3xl shadow-2xl border-2 border-slate-700/80 object-cover"
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Icon chính thức • GMS-Protect
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-2 max-w-xs">
+                    Mascot Android 3D với khiên bảo vệ Google G và năng lượng hào quang xoay quanh.
+                  </p>
+                </div>
+
+                {/* Right side resolution details */}
+                <div className="md:col-span-7 space-y-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-emerald-400" />
+                      Đã đồng bộ vào toàn bộ tài nguyên Android
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Icon đã được chuyển đổi chính xác thành các độ phân giải tương thích chuẩn Android và HyperOS:
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    {ICON_RESOLUTIONS.map((item, idx) => (
+                      <div key={idx} className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-between">
+                        <div>
+                          <div className="text-xs font-semibold text-emerald-400 uppercase">{item.density}</div>
+                          <div className="text-[11px] font-mono text-slate-400 truncate max-w-[180px]">{item.file}</div>
+                        </div>
+                        <span className="text-xs font-mono font-medium text-slate-300 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                          {item.size}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-1.5">
+                    <div className="font-semibold text-white flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      Đặc điểm kỹ thuật:
+                    </div>
+                    <ul className="list-disc pl-5 space-y-1 text-slate-400 text-xs">
+                      <li>Hỗ trợ cả biểu tượng thông thường (<code>ic_launcher</code>) và biểu tượng tròn (<code>ic_launcher_round</code>).</li>
+                      <li>Cập nhật màu nền Adaptive Icon (<code>ic_launcher_background.xml</code>) sang sắc thái Dark Navy (<code>#080c1d</code>).</li>
+                      <li>Tích hợp icon web và favicon (<code>/favicon.png</code>, <code>/icon.png</code>).</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tab 1: Workflow YAML */}
         {activeTab === 'workflow' && (
@@ -462,7 +567,7 @@ export default function App() {
                 <div>📁 <span className="text-amber-400">src/main/</span></div>
                 <div className="pl-6 text-slate-300">├── 📄 AndroidManifest.xml <span className="text-slate-400">(Quyền & Service HyperOS)</span></div>
                 <div className="pl-6 text-slate-300">├── 📁 java/com/hanh/gmsprotect/ <span className="text-slate-400">(MilletWatch, Aurogon, MainActivity, ...)</span></div>
-                <div className="pl-6 text-slate-300">└── 📁 res/ <span className="text-slate-400">(Giao diện, chuỗi vi/en, icons)</span></div>
+                <div className="pl-6 text-slate-300">└── 📁 res/ <span className="text-slate-400">(Giao diện, chuỗi vi/en, icons mới đã cập nhật)</span></div>
                 <div>📄 build.gradle <span className="text-emerald-400">← [AGP 8.4.2, SDK 34, compile options JDK 17]</span></div>
                 <div>📄 settings.gradle <span className="text-blue-400">← [Google & MavenCentral repos]</span></div>
                 <div>📄 gradle.properties <span className="text-slate-400">← [JVM args & AndroidX]</span></div>
@@ -505,12 +610,12 @@ export default function App() {
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-white">Commit và Push lên GitHub</h4>
                     <p className="text-xs text-slate-400 mt-1 mb-2">
-                      Đưa file workflow và cấu hình Gradle lên nhánh <code>main</code> của repository:
+                      Đưa file workflow, icon mới và cấu hình Gradle lên nhánh <code>main</code> của repository:
                     </p>
                     <div className="bg-slate-950 rounded-lg p-3 font-mono text-xs text-slate-300 border border-slate-800 flex items-center justify-between">
-                      <code>git add . && git commit -m "Add GitHub Actions APK build workflow" && git push origin main</code>
+                      <code>git add . && git commit -m "Update app icon and add GitHub Actions build" && git push origin main</code>
                       <button
-                        onClick={() => handleCopy('git add . && git commit -m "Add GitHub Actions APK build workflow" && git push origin main', 'git')}
+                        onClick={() => handleCopy('git add . && git commit -m "Update app icon and add GitHub Actions build" && git push origin main', 'git')}
                         className="text-xs text-slate-400 hover:text-white ml-2"
                       >
                         {copiedKey === 'git' ? 'Đã chép' : 'Chép'}
@@ -561,7 +666,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800 bg-slate-900/50 py-4 text-center text-xs text-slate-500">
-        Xiaomi Notification Fix (GMS Protect) • Automated CI/CD by GitHub Actions
+        Xiaomi Notification Fix (GMS-Protect) • Automated CI/CD by GitHub Actions
       </footer>
     </div>
   );

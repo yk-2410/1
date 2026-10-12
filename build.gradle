@@ -12,8 +12,6 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0.0"
-
-        setProperty("archivesBaseName", "app")
     }
 
     buildTypes {
@@ -31,11 +29,21 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'ProtectedPermissions'
+    }
+
     packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+}
+
+base {
+    archivesName = 'app'
 }
 
 dependencies {

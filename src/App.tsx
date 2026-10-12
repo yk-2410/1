@@ -73,9 +73,17 @@ jobs:
           fi
 
           echo "Found APK at: $FOUND_APK"
-          mkdir -p build/outputs/apk/debug
-          cp -f "$FOUND_APK" build/outputs/apk/debug/app-debug.apk
-          echo "apk_file=build/outputs/apk/debug/app-debug.apk" >> "$GITHUB_OUTPUT"
+          TARGET_DIR="build/outputs/apk/debug"
+          TARGET_APK="$TARGET_DIR/app-debug.apk"
+
+          mkdir -p "$TARGET_DIR"
+
+          # Only copy if source and destination are different paths
+          if [ "$(realpath "$FOUND_APK")" != "$(realpath -m "$TARGET_APK")" ]; then
+            cp -f "$FOUND_APK" "$TARGET_APK"
+          fi
+
+          echo "apk_file=$TARGET_APK" >> "$GITHUB_OUTPUT"
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
@@ -83,7 +91,8 @@ jobs:
           name: Xiaomi-Notification-Fix-Debug
           path: \${{ steps.locate_apk.outputs.apk_file }}
           if-no-files-found: error
-          retention-days: 30`;
+          retention-days: 30
+`;
 
 const BUILD_GRADLE = `plugins {
     id 'com.android.application' version '8.4.2' apply true

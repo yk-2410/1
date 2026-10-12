@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application' version '8.4.2' apply true
+}
+
+android {
+    namespace 'com.hanh.gmsprotect'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.hanh.gmsprotect'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        setProperty("archivesBaseName", "app")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    // Pure Android framework APIs - no external dependencies required
+}

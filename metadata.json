@@ -1,0 +1,6 @@
+{
+  "name": "Xiaomi Notification Fix - Android Build CI",
+  "description": "Automated GitHub Actions workflow and Gradle build configuration for GMS-Protect / Xiaomi Notification Fix.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
